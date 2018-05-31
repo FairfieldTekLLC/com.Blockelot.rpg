@@ -29,4 +29,6 @@ public class PlayerInfoSaveResponse {
     public void setSuccess(Boolean s) {
         Success = s;
     }
+    
+    
 }

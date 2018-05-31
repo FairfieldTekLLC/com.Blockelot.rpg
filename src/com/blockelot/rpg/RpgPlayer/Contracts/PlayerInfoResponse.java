@@ -16,10 +16,72 @@ public class PlayerInfoResponse {
     private int Id;
     private String Uuid;
     private int HpCur;
-    private int HpMax;
+    
     private int Exp;
     private int Lvl;
     private int ExpToLevel;
+    private int Str;
+    private int Sta;
+    private int Dex;
+    private int Wis;
+    private int Cha;
+    private int Ac;
+    
+    private String InvCont;
+    private String InvArm;
+    
+    public String getInvCont(){
+        return InvCont;
+    }
+    public void setInvCont(String json){
+        InvCont=json;
+    }
+    
+    public String getInvArm(){
+        return InvArm;
+    }
+    public void setInvArm(String json){
+        InvArm= json;
+    }
+    public int getStr(){
+        return Str;
+    }
+    public void setStr(int i){
+        Str=i;
+    }
+    
+    public int getSta(){
+        return Sta;
+    }
+    public void setSta(int i){
+        Sta=i;
+    }
+    
+    public int getDex(){
+        return Dex;
+    }
+    
+    public void setDex(int i){
+        Dex=i;
+    }
+    public int getWis(){
+        return Wis;
+    }
+    public void setWis(int i){
+        Wis=i;
+    }
+    public int getCha(){
+        return Cha;
+    }
+    public void setCha(int i){
+        Cha = i;
+    }
+    public int getAc(){
+        return Ac;
+    }
+    public void setAc(int i){
+        Ac = i;
+    }
 
     public int getExpToLevel() {
         return ExpToLevel;
@@ -69,14 +131,6 @@ public class PlayerInfoResponse {
         HpCur = hp;
     }
 
-    public int getHpMax() {
-        return HpMax;
-
-    }
-
-    public void setHpMax(int h) {
-        HpMax = h;
-    }
 
     public int getExp() {
         return Exp;

@@ -15,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import com.blockelot.rpg.RpgPlayer.CustomEvents.ArmorEquip.*;
 
 /**
  *
@@ -59,4 +60,11 @@ public class PlayerListener implements Listener {
             Plugin.PlayerInfoList.remove(player);
         }
     }
+    
+    @EventHandler
+    public void onArmorEquipEvent(ArmorEquipEvent event){
+        
+        Plugin.print("Player: " + event.getPlayer().getName() + " equiped " + event.getNewArmorPiece().getType().name());
+    }
+    
 }

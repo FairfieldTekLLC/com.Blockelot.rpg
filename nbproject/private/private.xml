@@ -2,17 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/NetBeans/com.blockelot.rpg/com.blockelot.rpg/src/com/blockelot/rpg/RpgPlayer/Util/DataLoader.java</file>
-            <file>file:/C:/NetBeans/com.blockelot.rpg/com.blockelot.rpg/src/com/blockelot/rpg/Plugin.java</file>
-            <file>file:/C:/NetBeans/com.blockelot.rpg/com.blockelot.rpg/src/me/Bleuzen/RPGHealthPlus/Utils.java</file>
-            <file>file:/C:/NetBeans/com.blockelot.rpg/com.blockelot.rpg/src/com/blockelot/rpg/RpgPlayer/Contracts/PlayerInfoResponse.java</file>
-            <file>file:/C:/NetBeans/com.blockelot.rpg/com.blockelot.rpg/src/com/blockelot/rpg/RpgPlayer/Tasks/SavePlayerInfoTask.java</file>
-            <file>file:/C:/NetBeans/com.blockelot.rpg/com.blockelot.rpg/src/com/blockelot/rpg/RpgPlayer/Util/Graphics.java</file>
-            <file>file:/C:/NetBeans/com.blockelot.rpg/com.blockelot.rpg/src/me/Bleuzen/RPGHealthPlus/Main.java</file>
-            <file>file:/C:/NetBeans/com.blockelot.rpg/com.blockelot.rpg/src/com/blockelot/rpg/RpgPlayer/Classes/PlayerInfo.java</file>
-            <file>file:/C:/NetBeans/com.blockelot.rpg/com.blockelot.rpg/src/com/blockelot/rpg/RpgPlayer/Commands/Commands.java</file>
-            <file>file:/C:/NetBeans/com.blockelot.rpg/com.blockelot.rpg/src/com/blockelot/rpg/RpgPlayer/Contracts/PlayerInfoSaveResponse.java</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

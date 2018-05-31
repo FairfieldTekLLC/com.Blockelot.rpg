@@ -12,6 +12,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.Material;
+import org.bukkit.inventory.meta.ItemMeta;
+import java.util.*;
 
 /**
  *
@@ -26,6 +30,21 @@ public class EntityListener implements Listener {
             if (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE) {
                 Plugin.PlayerInfoList.get(p).onMobKill(e.getEntity());
             }
+            
+            ItemStack item = new ItemStack(Material.CHAINMAIL_BOOTS, 1);
+            
+            ItemMeta testMeta = item.getItemMeta();
+            
+            List<String> testLore = new ArrayList<String>();
+            testMeta.setDisplayName("Test Me");
+            testLore.add("Line 1");
+            testLore.add("Line 2");
+            testLore.add("Line 3");
+            testMeta .setLore(testLore);
+            item.setItemMeta(testMeta);
+            
+            
+            e.getDrops().add(item);
         }
 
     }

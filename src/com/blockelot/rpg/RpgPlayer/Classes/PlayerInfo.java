@@ -14,57 +14,55 @@ import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import com.blockelot.rpg.RpgPlayer.Util.Inventory;
+import org.bukkit.inventory.ItemStack;
+import de.tr7zw.itemnbtapi.*;
+import java.util.*;
 
 /**
  *
  * @author geev
  */
 public class PlayerInfo {
-
+    
     public Boolean LoadedSuccess = false;
-
+    
     private final Player Player;
     private Boolean LastSaveSuccess = false;
     private int Id;
-    private int HitPoint;
-    private int HitPointMax;
-    private int Experience;
-
-    private int Level;
     private String Uuid;
     private boolean SavingAsync = false;
-    private int ClassId;
-    private String ClassName;
-    private int ExpToLevel;
+    
+    private PlayerStats PlayerStats;
+    
     public PlayerInfo(Player player) throws Exception {
-
+        
+        PlayerStats = new PlayerStats(this);
         Player = player;
         Uuid = player.getUniqueId().toString();
         Plugin.print("SetHeathScaled:false");
         Player.setHealthScaled(false);
         Plugin.print("Loading Info.");
-        PlayerInfoResponse response = null;
+        PlayerInfoResponse response;
         try {
-
+            
             Plugin.print("Creatng GSON");
             Gson gson = new Gson();
-
+            
             Plugin.print("Creating PlayerInfoRequest");
             PlayerInfoRequest req = new PlayerInfoRequest();
-
+            
             Plugin.print("Setting Uuid to: " + this.Uuid);
             req.setUuid(this.Uuid);
-
+            
             Plugin.print("Setting Body");
             String body = gson.toJson(req);
-
+            
             Plugin.print("Requesting from server");
             response = gson.fromJson(Http.RequestHttp(Plugin.BaseUri + "PlayerLoad", body), PlayerInfoResponse.class);
-
+            
             if (response == null) {
                 Plugin.print("Failed...");
                 LoadedSuccess = false;
@@ -76,59 +74,85 @@ public class PlayerInfo {
             return;
         }
         Plugin.print("Success...");
-        setHitPointMax(response.getHpMax());
-        setHitPoint(response.getHpCur());
-        setExp(response.getExp());
-        setLevel(response.getLvl());
+        
         setId(response.getId());
-        setClassId(response.getClassId());
-        setClassName(response.getClassName());
-        setExpToLevel(response.getExpToLevel());
+        PlayerStats.LoadBase(response.getStr(), response.getSta(), response.getDex(), response.getWis(), response.getCha(), response.getAc());
+        
+        PlayerStats.setExpToLevel(response.getExpToLevel());
+        PlayerStats.setClassId(response.getClassId());
+        PlayerStats.setClassName(response.getClassName());
+        PlayerStats.setLevel(response.getLvl());
+        PlayerStats.setExp(response.getExp());
+        PlayerStats.setHpCurrent(response.getHpCur());
+        Player.getInventory().clear();
+        
+        Plugin.print(response.getInvArm());
+        
+        ItemStack[] tst = com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvArm());
+        Plugin.print("# of ITems " + tst.length);
+        player.getInventory().setArmorContents(tst);
+        
+        try{
+        Plugin.print(response.getInvCont());
+        tst = com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvCont());
+        Plugin.print("# of ITems " + tst.length);
+        player.getInventory().setContents(tst);
+        
+        //player.getInventory().getContents();
+        }
+        catch (Exception e)
+        {
+            Plugin.print("Exception: "+ e.getMessage());
+        }
+        //player.getInventory().setArmorContents(com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvArm()));
+        //player.getInventory().setContents(com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvCont()));
+        
+        PlayerStats.Update();
         LoadedSuccess = true;
         
     }
-
-    public int getExpToLevel() {
-        return ExpToLevel;
+    
+    public void SaveInventory() {
+        
     }
-
-    public final void setExpToLevel(int i) {
-        ExpToLevel = i;
+    
+    public PlayerStats getPlayerStats() {
+        return PlayerStats;
     }
-
-    public int getClassId() {
-        return ClassId;
+    
+    public Player getPlayer() {
+        return Player;
     }
-
-    public final void setClassId(int i) {
-        ClassId = i;
-    }
-
-    public String getClassName() {
-        return ClassName;
-    }
-
-    public final void setClassName(String name) {
-        ClassName = name;
-    }
-
-
+    
     public void setLastSaveSuccess(Boolean b) {
         Plugin.print("Last Save: " + b);
         LastSaveSuccess = b;
     }
-
+    
+    public void SendStats() {
+        Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + " Character Stats");
+        Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "=================");
+        Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "STR: " + PlayerStats.Base.getStr() + " (" + PlayerStats.Current.getStr() + ")");
+        Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "STA: " + PlayerStats.Base.getSta() + " (" + PlayerStats.Current.getSta() + ")");
+        Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "DEX: " + PlayerStats.Base.getDex() + " (" + PlayerStats.Current.getDex() + ")");
+        Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "WIS: " + PlayerStats.Base.getWis() + " (" + PlayerStats.Current.getWis() + ")");
+        Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "CHA: " + PlayerStats.Base.getCha() + " (" + PlayerStats.Current.getCha() + ")");
+        Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "AC: " + PlayerStats.Base.getAc() + " (" + PlayerStats.Current.getAc() + ")");
+        Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "HP: " + (int) Player.getHealth() + " (" + PlayerStats.Current.getMaxHp() + ")");
+        
+    }
+    
     public void SendExpBar() {
-        double per = (double) getExp() / (double) getExpToLevel();
-
+        double per = (double) PlayerStats.getExp() / (double) PlayerStats.getExpToLevel();
+        
         Plugin.print("Percent: " + per);
-
+        
         StringBuilder xpBar = new StringBuilder();
         xpBar.append(ChatColor.RED).append("").append(ChatColor.BOLD);
         for (int i = 0; i < per * 40; i++) {
             xpBar.append("▍");
         }
-
+        
         xpBar.append(ChatColor.GRAY).append("").append(ChatColor.BOLD);
         for (int i = (int) Math.ceil(per * 40); i < 40; i++) {
             xpBar.append("▍");
@@ -136,113 +160,76 @@ public class PlayerInfo {
         Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + " Experience Bar");
         Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "===============");
         Player.sendMessage(xpBar.toString());
-
+        
     }
-
+    
     public void SendExpMessage(Location loc, double gained) {
         Graphics.showHologram(loc, ChatColor.RED + "+" + gained + " Experience.");
     }
-
+    
     public Boolean getLastSaveSuccess() {
         return LastSaveSuccess;
     }
-
+    
     public String getUuid() {
         return Uuid;
     }
-
+    
     public final void SaveToDisk() {
-
+        
         if (!getSavingAsync()) {
             Plugin.print("Saving Player...");
             setSavingAsync(true);
-            setHitPoint((int) Player.getHealth());
-            SavePlayerInfoTask task = new SavePlayerInfoTask(this);
+            PlayerInfoResponse req = new PlayerInfoResponse();
+            req.setExp(getPlayerStats().getExp());
+            req.setHpCur((int) Player.getHealth());
+            req.setId(getId());
+            req.setLvl(getPlayerStats().getLevel());
+            req.setUuid(getUuid());
+            
+            String[] tmp = com.blockelot.rpg.RpgPlayer.Util.Inventory.playerInventoryToBase64(getPlayer().getInventory());
+            
+            req.setInvCont(tmp[0]);
+            req.setInvArm(tmp[1]);
+            
+            SavePlayerInfoTask task = new SavePlayerInfoTask(req, this);
             Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), task);
         }
     }
-
-    public int getLevel() {
-        return Level;
-    }
-
+    
     public int getId() {
         return Id;
     }
-
+    
     public final void setId(int id) {
         Plugin.print("Setting ID: " + id);
         Id = id;
     }
-
-    public final void setLevel(int level) {
-        Plugin.print("Setting Level: " + level);
-        Level = level;
-    }
-
-    public void addHitPointMax(int add) {
-        HitPointMax += add;
-        Player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HitPointMax);
-    }
-
-    public final void setHitPointMax(int hp) {
-        Plugin.print("Setting Max HP: " + hp);
-        HitPointMax = hp;
-        Player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(HitPointMax);
-    }
-
-    public int getHitPointMax() {
-        return HitPointMax;
-    }
-
-    public int getHitPoint() {
-        return HitPoint;
-    }
-
+    
     public boolean getSavingAsync() {
         return SavingAsync;
     }
-
+    
     public void setSavingAsync(Boolean b) {
         Plugin.print("Setting Saving Async(" + b + ")");
         SavingAsync = b;
     }
-
-    public final void setHitPoint(int hp) {
-        Plugin.print("Setting Current HP: " + hp);
-        HitPoint = hp;
-        Player.setHealth(HitPoint);
-    }
-
-    public int getExp() {
-        return Experience;
-    }
-
-    public final void setExp(int xp) {
-        Plugin.print("Setting Exp: " + xp);
-        Experience = xp;
-    }
-
-    public void addExp(int add) {
-        Experience += add;
-        if (Experience > ExpToLevel) {
-            Experience = Experience - ExpToLevel;
-            setLevel(getLevel() + 1);
-            Player.playSound(Player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5F, 1.0F);
-            Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "Welcome to Level " + getLevel());
-            this.SaveToDisk();
-        }
-    }
-
+    
     public void onMobKill(LivingEntity entity) {
         int expGained = Plugin.MobList.get(entity.getType().toString());
         if (expGained == 0) {
             return;
         }
-        addExp(expGained);
+        PlayerStats.addExp(expGained);
         if (Plugin.useHolographicDisplays) {
-            Graphics.showHologram(entity.getLocation().add(0, entity.getEyeHeight(), 0),""+ ChatColor.RED + "+ " + expGained + " XP " + ChatColor.GRAY + "[" + getExp() + "/" + getExpToLevel() + "]");
+            Graphics.showHologram(entity.getLocation()
+                    .add(0, entity.getEyeHeight(), 0),
+                    "" + ChatColor.RED
+                    + "+ " + expGained
+                    + " XP " + ChatColor.GRAY
+                    + "[" + PlayerStats.getExp()
+                    + "/" + PlayerStats.getExpToLevel() + "]");
         }
-
+        
     }
 }

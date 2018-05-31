@@ -17,6 +17,7 @@ import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import me.Bleuzen.RPGHealthPlus.Main;
 import org.bukkit.Bukkit;
+
 /**
  *
  * @author geev
@@ -26,29 +27,22 @@ public class Commands implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender cs, Command cmnd, String string, String[] args) {
         if (string.equalsIgnoreCase("rpg")) {
+            
+            //Shows the users current Exp and Exp needed to level.
             if (args.length == 1 && args[0].equalsIgnoreCase("exp")) {
                 if (cs instanceof Player) {
                     Plugin.PlayerInfoList.get((Player) cs).SendExpBar();
                     return true;
                 }
             }
-            if (args.length == 1 && args[0].equalsIgnoreCase("holo")) {
-                if (cs instanceof Player) {
-                    
-                    Player p = (Player)cs;
-                    final Hologram holo = HologramsAPI.createHologram(Plugin.getInstance(), p.getLocation());
-                    holo.appendTextLine("This is a test.");
-                     Bukkit.getScheduler().scheduleSyncDelayedTask(Plugin.getInstance(), new Runnable() {
-                        @Override
-                        public void run() {
-                            holo.delete();
-                        }
-                    }, 40);
-                    //Graphics.showHologram(((Player) cs).getLocation().add(0, ((Player) cs).getEyeHeight(), 0), ChatColor.RED + " This is a test.");
-                    return true;
-                    
-                }
-            }
+            //Shows the players stats.
+            if (args.length == 1 && args[0].equalsIgnoreCase("stats")) {
+                  if (cs instanceof Player) {
+                      Plugin.PlayerInfoList.get((Player)cs).SendStats();
+                      return true;
+                  }
+                  
+            }            
 
             if (args[0].equalsIgnoreCase("reload")) {
                 //Main.getInstance().waitSave();

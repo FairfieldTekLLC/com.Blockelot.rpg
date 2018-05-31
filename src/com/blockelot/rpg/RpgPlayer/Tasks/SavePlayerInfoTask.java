@@ -19,26 +19,29 @@ import com.google.gson.Gson;
 public class SavePlayerInfoTask implements Runnable {
 
     PlayerInfo PlayerInfo = null;
+//    private int CurrentHp;
+    PlayerInfoResponse Req;
 
-    public SavePlayerInfoTask(PlayerInfo pi) {
+    public SavePlayerInfoTask(PlayerInfoResponse req,PlayerInfo pi) {
+        Req=req;
         PlayerInfo = pi;
+//        CurrentHp = currentHp;
     }
 
     @Override
     public void run() {
         try {
             Gson gson = new Gson();
-            PlayerInfoResponse req = new PlayerInfoResponse();
-            req.setExp(PlayerInfo.getExp());
-            req.setHpCur(PlayerInfo.getHitPoint());
-            req.setHpMax(PlayerInfo.getHitPointMax());
-            req.setId(PlayerInfo.getId());
-            req.setLvl(PlayerInfo.getLevel());
-            req.setUuid(PlayerInfo.getUuid());
-            String body = gson.toJson(req);
+//            PlayerInfoResponse req = new PlayerInfoResponse();
+//            req.setExp(PlayerInfo.getPlayerStats().getExp());
+//            req.setHpCur(CurrentHp);
+//            req.setId(PlayerInfo.getId());
+//            req.setLvl(PlayerInfo.getPlayerStats().getLevel());
+//            req.setUuid(PlayerInfo.getUuid());
+            String body = gson.toJson(Req);
             PlayerInfoSaveResponse response = gson.fromJson(Http.RequestHttp(Plugin.BaseUri + "PlayerSave", body), PlayerInfoSaveResponse.class);
             PlayerInfo.setLastSaveSuccess(response.getSuccess());
-            PlayerInfo.setExpToLevel(response.getExpToLevel());
+            PlayerInfo.getPlayerStats().setExpToLevel(response.getExpToLevel());
             Plugin.print("Player: " + PlayerInfo.getUuid() + " saved.");
         } catch (Exception e) {
             Plugin.print("Player: " + PlayerInfo.getUuid() + " failed to saved.");
