@@ -60,11 +60,11 @@ public class PlayerListener implements Listener {
             Plugin.PlayerInfoList.remove(player);
         }
     }
-    
+
     @EventHandler
-    public void onArmorEquipEvent(ArmorEquipEvent event){
-        
+    public void onArmorEquipEvent(ArmorEquipEvent event) {
         Plugin.print("Player: " + event.getPlayer().getName() + " equiped " + event.getNewArmorPiece().getType().name());
+        Plugin.PlayerInfoList.get(event.getPlayer()).SaveToDisk();
     }
-    
+
 }

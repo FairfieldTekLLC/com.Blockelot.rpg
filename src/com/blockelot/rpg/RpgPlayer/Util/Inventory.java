@@ -28,12 +28,13 @@ public class Inventory {
      * @return Array of strings: [ main content, armor content ]
      * @throws IllegalStateException
      */
-    public static String[] playerInventoryToBase64(PlayerInventory playerInventory) throws IllegalStateException {
+    public static String[] playerInventoryToBase64(Player player) throws IllegalStateException {
         //get the main content part, this doesn't return the armor
-        String content = itemStackArrayToBase64(playerInventory.getContents());
-        String armor = itemStackArrayToBase64(playerInventory.getArmorContents());
+        String content = itemStackArrayToBase64(player.getInventory().getContents());
+        String armor = itemStackArrayToBase64(player.getInventory().getArmorContents());
+        String ender = itemStackArrayToBase64(player.getEnderChest().getContents());
 
-        return new String[]{content, armor};
+        return new String[]{content, armor,ender};
     }
 
     /**

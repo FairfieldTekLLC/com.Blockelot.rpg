@@ -20,6 +20,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.blockelot.rpg.RpgPlayer.CustomEvents.ArmorEquip.ArmorListener;
+import com.blockelot.rpg.RpgPlayer.RabbitMQ.MqRpcClient;
+import com.blockelot.rpg.RpgPlayer.RabbitMQ.RabbitMessagePayload;
+import com.rabbitmq.client.BuiltinExchangeType;
+import com.blockelot.rpg.RpgPlayer.Contracts.*;
+import java.util.UUID;
+
 /**
  *
  * @author geev
@@ -28,8 +34,8 @@ public class Plugin extends JavaPlugin implements Listener {
 
     public static BlockingQueue ConsoleQueue = new ArrayBlockingQueue(1024);
 
-    //public static String BaseUri = "http://mc.fairfieldtek.com/api/Player/v1/";
-    public static String BaseUri = "http://localhost:31312/api/Player/v1/";
+    public static String BaseUri = "http://mc.fairfieldtek.com/api/Player/v1/";
+    //public static String BaseUri = "http://localhost:31312/api/Player/v1/";
 
     private static Plugin plugin;
 
@@ -44,7 +50,6 @@ public class Plugin extends JavaPlugin implements Listener {
     static final String RunningVersion = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 
     public static HashMap<String, Integer> MobList = new HashMap<>();
-
 
     public static void print(String text) {
         try {
@@ -63,6 +68,7 @@ public class Plugin extends JavaPlugin implements Listener {
     public static Plugin getInstance() {
         return plugin;
     }
+
     @Override
     public void onDisable() {
         Running = false;
@@ -70,6 +76,18 @@ public class Plugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+
+        try {
+            MqRpcClient c = new MqRpcClient("192.168.211.63", "Minecraft", BuiltinExchangeType.DIRECT);
+            PlayerInfoRequest pir = new PlayerInfoRequest();
+            pir.setUuid(UUID.randomUUID().toString());
+            RabbitMessagePayload msg = new RabbitMessagePayload(pir);
+            msg.setType("PlayerInfoRequest");
+            RabbitMessagePayload response = c.call("Minecraft", "TestMessage", msg, 10);
+            System.out.print("Response: " + response.getData());
+        } catch (Exception e) {
+            System.out.print(e.getMessage());
+        }
 
         print(" ____  _            _        _       _     _____  _____   _____ ", ChatColor.BLUE);
         print("|  _ \\| |          | |      | |     | |   |  __ \\|  __ \\ / ____|", ChatColor.BLUE);

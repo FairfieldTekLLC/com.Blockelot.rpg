@@ -26,19 +26,19 @@ import java.util.*;
  * @author geev
  */
 public class PlayerInfo {
-    
+
     public Boolean LoadedSuccess = false;
-    
+
     private final Player Player;
     private Boolean LastSaveSuccess = false;
     private int Id;
     private String Uuid;
     private boolean SavingAsync = false;
-    
+
     private PlayerStats PlayerStats;
-    
+
     public PlayerInfo(Player player) throws Exception {
-        
+
         PlayerStats = new PlayerStats(this);
         Player = player;
         Uuid = player.getUniqueId().toString();
@@ -47,22 +47,22 @@ public class PlayerInfo {
         Plugin.print("Loading Info.");
         PlayerInfoResponse response;
         try {
-            
+
             Plugin.print("Creatng GSON");
             Gson gson = new Gson();
-            
+
             Plugin.print("Creating PlayerInfoRequest");
             PlayerInfoRequest req = new PlayerInfoRequest();
-            
+
             Plugin.print("Setting Uuid to: " + this.Uuid);
             req.setUuid(this.Uuid);
-            
+
             Plugin.print("Setting Body");
             String body = gson.toJson(req);
-            
+
             Plugin.print("Requesting from server");
             response = gson.fromJson(Http.RequestHttp(Plugin.BaseUri + "PlayerLoad", body), PlayerInfoResponse.class);
-            
+
             if (response == null) {
                 Plugin.print("Failed...");
                 LoadedSuccess = false;
@@ -74,10 +74,10 @@ public class PlayerInfo {
             return;
         }
         Plugin.print("Success...");
-        
+
         setId(response.getId());
         PlayerStats.LoadBase(response.getStr(), response.getSta(), response.getDex(), response.getWis(), response.getCha(), response.getAc());
-        
+
         PlayerStats.setExpToLevel(response.getExpToLevel());
         PlayerStats.setClassId(response.getClassId());
         PlayerStats.setClassName(response.getClassName());
@@ -85,50 +85,56 @@ public class PlayerInfo {
         PlayerStats.setExp(response.getExp());
         PlayerStats.setHpCurrent(response.getHpCur());
         Player.getInventory().clear();
-        
+
         Plugin.print(response.getInvArm());
-        
-        ItemStack[] tst = com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvArm());
-        Plugin.print("# of ITems " + tst.length);
-        player.getInventory().setArmorContents(tst);
-        
-        try{
-        Plugin.print(response.getInvCont());
-        tst = com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvCont());
-        Plugin.print("# of ITems " + tst.length);
-        player.getInventory().setContents(tst);
-        
-        //player.getInventory().getContents();
+        ItemStack[] tst;
+        try {
+            tst = com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvArm());
+            Plugin.print("# of ITems " + tst.length);
+            player.getInventory().setArmorContents(tst);
+        } catch (Exception e) {
+            Plugin.print("Exception: " + e.getMessage());
         }
-        catch (Exception e)
-        {
-            Plugin.print("Exception: "+ e.getMessage());
+
+        try {
+            Plugin.print(response.getInvCont());
+            tst = com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvCont());
+            Plugin.print("# of ITems " + tst.length);
+            player.getInventory().setContents(tst);
+
+            //player.getInventory().getContents();
+        } catch (Exception e) {
+            Plugin.print("Exception: " + e.getMessage());
         }
-        //player.getInventory().setArmorContents(com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvArm()));
-        //player.getInventory().setContents(com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvCont()));
-        
+
+        try {
+            Plugin.print(response.getInvEnd());
+            tst = com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvEnd());
+            Plugin.print("# of ITems " + tst.length);
+            player.getEnderChest().setContents(tst);
+
+        } catch (Exception e) {
+            Plugin.print("Exception: " + e.getMessage());
+        }
+
         PlayerStats.Update();
         LoadedSuccess = true;
-        
+
     }
-    
-    public void SaveInventory() {
-        
-    }
-    
+
     public PlayerStats getPlayerStats() {
         return PlayerStats;
     }
-    
+
     public Player getPlayer() {
         return Player;
     }
-    
+
     public void setLastSaveSuccess(Boolean b) {
         Plugin.print("Last Save: " + b);
         LastSaveSuccess = b;
     }
-    
+
     public void SendStats() {
         Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + " Character Stats");
         Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "=================");
@@ -139,20 +145,20 @@ public class PlayerInfo {
         Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "CHA: " + PlayerStats.Base.getCha() + " (" + PlayerStats.Current.getCha() + ")");
         Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "AC: " + PlayerStats.Base.getAc() + " (" + PlayerStats.Current.getAc() + ")");
         Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "HP: " + (int) Player.getHealth() + " (" + PlayerStats.Current.getMaxHp() + ")");
-        
+
     }
-    
+
     public void SendExpBar() {
         double per = (double) PlayerStats.getExp() / (double) PlayerStats.getExpToLevel();
-        
+
         Plugin.print("Percent: " + per);
-        
+
         StringBuilder xpBar = new StringBuilder();
         xpBar.append(ChatColor.RED).append("").append(ChatColor.BOLD);
         for (int i = 0; i < per * 40; i++) {
             xpBar.append("▍");
         }
-        
+
         xpBar.append(ChatColor.GRAY).append("").append(ChatColor.BOLD);
         for (int i = (int) Math.ceil(per * 40); i < 40; i++) {
             xpBar.append("▍");
@@ -160,23 +166,23 @@ public class PlayerInfo {
         Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + " Experience Bar");
         Player.sendMessage("       ➠   " + ChatColor.BOLD + ChatColor.YELLOW + "===============");
         Player.sendMessage(xpBar.toString());
-        
+
     }
-    
+
     public void SendExpMessage(Location loc, double gained) {
         Graphics.showHologram(loc, ChatColor.RED + "+" + gained + " Experience.");
     }
-    
+
     public Boolean getLastSaveSuccess() {
         return LastSaveSuccess;
     }
-    
+
     public String getUuid() {
         return Uuid;
     }
-    
+
     public final void SaveToDisk() {
-        
+
         if (!getSavingAsync()) {
             Plugin.print("Saving Player...");
             setSavingAsync(true);
@@ -186,35 +192,35 @@ public class PlayerInfo {
             req.setId(getId());
             req.setLvl(getPlayerStats().getLevel());
             req.setUuid(getUuid());
-            
-            String[] tmp = com.blockelot.rpg.RpgPlayer.Util.Inventory.playerInventoryToBase64(getPlayer().getInventory());
-            
+
+            String[] tmp = com.blockelot.rpg.RpgPlayer.Util.Inventory.playerInventoryToBase64(getPlayer());
+
             req.setInvCont(tmp[0]);
             req.setInvArm(tmp[1]);
-            
+
             SavePlayerInfoTask task = new SavePlayerInfoTask(req, this);
             Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), task);
         }
     }
-    
+
     public int getId() {
         return Id;
     }
-    
+
     public final void setId(int id) {
         Plugin.print("Setting ID: " + id);
         Id = id;
     }
-    
+
     public boolean getSavingAsync() {
         return SavingAsync;
     }
-    
+
     public void setSavingAsync(Boolean b) {
         Plugin.print("Setting Saving Async(" + b + ")");
         SavingAsync = b;
     }
-    
+
     public void onMobKill(LivingEntity entity) {
         int expGained = Plugin.MobList.get(entity.getType().toString());
         if (expGained == 0) {
@@ -230,6 +236,6 @@ public class PlayerInfo {
                     + "[" + PlayerStats.getExp()
                     + "/" + PlayerStats.getExpToLevel() + "]");
         }
-        
+
     }
 }

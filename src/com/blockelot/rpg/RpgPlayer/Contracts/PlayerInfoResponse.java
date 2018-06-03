@@ -29,6 +29,14 @@ public class PlayerInfoResponse {
     
     private String InvCont;
     private String InvArm;
+    private String InvEnd;
+    
+    public String getInvEnd(){
+        return InvEnd;
+    }
+    public void setInvEnd(String s){
+        InvEnd = s;
+    }
     
     public String getInvCont(){
         return InvCont;
