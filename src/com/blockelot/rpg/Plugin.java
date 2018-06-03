@@ -24,7 +24,10 @@ import com.blockelot.rpg.RpgPlayer.RabbitMQ.MqRpcClient;
 import com.blockelot.rpg.RpgPlayer.RabbitMQ.RabbitMessagePayload;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.blockelot.rpg.RpgPlayer.Contracts.*;
+import com.blockelot.rpg.RpgPlayer.RabbitMQ.MqRpcListener;
 import java.util.UUID;
+import com.blockelot.rpg.RpgPlayer.RabbitMQ.ExecuterTest;
+import java.util.Arrays;
 
 /**
  *
@@ -50,6 +53,8 @@ public class Plugin extends JavaPlugin implements Listener {
     static final String RunningVersion = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 
     public static HashMap<String, Integer> MobList = new HashMap<>();
+
+    public static MqRpcListener MqListener;
 
     public static void print(String text) {
         try {
@@ -77,16 +82,23 @@ public class Plugin extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
 
+//        try {
+//            MqRpcClient c = new MqRpcClient("192.168.211.63", "Minecraft", BuiltinExchangeType.DIRECT);
+//            PlayerInfoRequest pir = new PlayerInfoRequest();
+//            pir.setUuid(UUID.randomUUID().toString());
+//            RabbitMessagePayload msg = new RabbitMessagePayload(pir);
+//            msg.setType("PlayerInfoRequest");
+//            RabbitMessagePayload response = c.call("Minecraft", "TestMessage", msg, 10);
+//            System.out.print("Response: " + response.getData());
+//        } catch (Exception e) {
+//            System.out.print(e.getMessage());
+//        }
         try {
-            MqRpcClient c = new MqRpcClient("192.168.211.63", "Minecraft", BuiltinExchangeType.DIRECT);
-            PlayerInfoRequest pir = new PlayerInfoRequest();
-            pir.setUuid(UUID.randomUUID().toString());
-            RabbitMessagePayload msg = new RabbitMessagePayload(pir);
-            msg.setType("PlayerInfoRequest");
-            RabbitMessagePayload response = c.call("Minecraft", "TestMessage", msg, 10);
-            System.out.print("Response: " + response.getData());
+            MqListener = new MqRpcListener("Test", "192.168.211.63", "Minecraft", "JavaTestQueue", BuiltinExchangeType.DIRECT, true, new ExecuterTest());
+            MqListener.start();
         } catch (Exception e) {
             System.out.print(e.getMessage());
+            System.out.print(Arrays.toString(e.getStackTrace()));
         }
 
         print(" ____  _            _        _       _     _____  _____   _____ ", ChatColor.BLUE);

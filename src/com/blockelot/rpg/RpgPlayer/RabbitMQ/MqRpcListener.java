@@ -62,17 +62,13 @@ public final class MqRpcListener extends Thread implements AutoCloseable {
             Factory.setUsername("minecraft");
             Factory.setPassword("minecraft");
             Factory.setVirtualHost("/");
-
             Connection = Factory.newConnection();
-
             Channel = Connection.createChannel();
             Channel.exchangeDeclare(Exchange, Type, true);
             Channel.queueDeclare(RpcQueue, true, true, false, null);
             Channel.basicQos(0, 20, false);
-            //Channel.queueBind(queue, exchange, queue);
-
+            Channel.queueBind(RpcQueue, Exchange, RpcQueue);
             System.out.println(" [x] Awaiting RPC requests");
-            
             final Consumer Consumer;
             Consumer = new DefaultConsumer(Channel) {
                 @Override
@@ -80,7 +76,6 @@ public final class MqRpcListener extends Thread implements AutoCloseable {
                     AMQP.BasicProperties replyProps = new AMQP.BasicProperties.Builder()
                             .correlationId(properties.getCorrelationId())
                             .build();
-
                     String response = "";
 
                     try {
@@ -91,10 +86,13 @@ public final class MqRpcListener extends Thread implements AutoCloseable {
                     } catch (RuntimeException e) {
                         System.out.println(" [.] " + e.toString());
                     } finally {
-                        Channel.basicPublish(Exchange, properties.getReplyTo(), replyProps, response.getBytes("UTF-8"));
-
-                        Channel.basicAck(envelope.getDeliveryTag(), false);
+                        System.out.print("Sending Message to: " + properties.getReplyTo());
                         
+                        String rQueue =properties.getReplyTo().split(":")[1];
+                        String rExchange =properties.getReplyTo().split(":")[0];
+                        
+                        Channel.basicPublish(rExchange, rQueue, replyProps, response.getBytes("UTF-8"));
+                        Channel.basicAck(envelope.getDeliveryTag(), false);
                         // RabbitMq consumer worker thread notifies the RPC server owner thread 
                         synchronized (MqRpcListener.this) {
                             this.notify();
