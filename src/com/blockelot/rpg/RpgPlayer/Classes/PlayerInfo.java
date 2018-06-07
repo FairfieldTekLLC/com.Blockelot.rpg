@@ -64,8 +64,6 @@ public class PlayerInfo {
 //        System.out.print("Level: " + response.getLvl());
 //        System.out.print("Exp: " + response.getExp());
 //        System.out.print("HP Current: " +response.getHpCur() );
-                
-
         setId(response.getId());
         PlayerStats.LoadBase(response.getStr(), response.getSta(), response.getDex(), response.getWis(), response.getCha(), response.getAc());
 
@@ -184,6 +182,18 @@ public class PlayerInfo {
             req.setId(getId());
             req.setLvl(getPlayerStats().getLevel());
             req.setUuid(getUuid());
+
+            PlayerWorldRequest pwr = new PlayerWorldRequest();
+            pwr.setPlayerId(Player.getUniqueId().toString());
+            try {
+                System.out.print("ASking for Server.");
+                PlayerWorldResponse response = Plugin.MqClient.Call("Minecraft", "BungeeQueue", pwr, 60, PlayerWorldResponse.class);
+                req.setLastWorld(response.getWorldName());
+                System.out.print("Got Response: " + response.getWorldName());
+            } catch (Exception e) {
+                System.out.print("Exception: " + e.getMessage());
+                System.out.print("Exception: " + Arrays.toString(e.getStackTrace()));
+            }
 
             String[] tmp = com.blockelot.rpg.RpgPlayer.Util.Inventory.playerInventoryToBase64(getPlayer());
 

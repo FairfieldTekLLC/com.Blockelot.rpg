@@ -86,6 +86,8 @@ public class Plugin extends JavaPlugin implements Listener {
             MqClient = new MqRpcClient("192.168.211.63", "Minecraft", BuiltinExchangeType.DIRECT);
         } catch (Exception e) {
             System.out.print("Failed to establish rabbit.");
+            System.out.print("Exception: " + e.getMessage());
+            System.out.print("Exception: " + Arrays.toString(e.getStackTrace()));
             return;
         }
 
@@ -124,6 +126,8 @@ public class Plugin extends JavaPlugin implements Listener {
                 }
             } catch (Exception e) {
                 System.out.print("Failed to Connect to MQ.");
+                   System.out.print("Exception: " + e.getMessage());
+            System.out.print("Exception: " + Arrays.toString(e.getStackTrace()));
                 return;
             }
 

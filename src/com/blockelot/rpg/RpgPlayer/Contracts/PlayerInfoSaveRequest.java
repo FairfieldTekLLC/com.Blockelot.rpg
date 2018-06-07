@@ -20,6 +20,15 @@ public class PlayerInfoSaveRequest {
     private String InvCont;
     private String InvArm;
     private String InvEnd;
+    private String LastWorld;
+    
+    public String getLastWorld(){
+        return LastWorld;
+    }
+    public void setLastWorld(String worldname)
+    {
+        LastWorld = worldname;
+    }  
     
     public String getInvEnd(){
         return InvEnd;

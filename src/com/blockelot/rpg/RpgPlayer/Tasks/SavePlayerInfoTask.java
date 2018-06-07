@@ -28,7 +28,7 @@ public class SavePlayerInfoTask implements Runnable {
     @Override
     public void run() {
         try {
-
+System.out.print("Saving Player.");
             PlayerInfoSaveResponse response = Plugin.MqClient.Call("Minecraft", "DataService", Req, 10, PlayerInfoSaveResponse.class);
             PlayerInfo.setLastSaveSuccess(response.getSuccess());
             PlayerInfo.getPlayerStats().setExpToLevel(response.getExpToLevel());
