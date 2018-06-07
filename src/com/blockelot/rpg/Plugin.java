@@ -11,7 +11,7 @@ import com.blockelot.rpg.RpgPlayer.Contracts.*;
 import com.blockelot.rpg.RpgPlayer.Listeners.CreatureListener;
 import com.blockelot.rpg.RpgPlayer.Listeners.EntityListener;
 import com.blockelot.rpg.RpgPlayer.Listeners.PlayerListener;
-import com.blockelot.rpg.RpgPlayer.Util.DataLoader;
+//import com.blockelot.rpg.RpgPlayer.Util.DataLoader;
 import java.util.HashMap;
 import java.util.concurrent.*;
 import org.bukkit.Bukkit;
@@ -55,6 +55,7 @@ public class Plugin extends JavaPlugin implements Listener {
     public static HashMap<String, Integer> MobList = new HashMap<>();
 
     public static MqRpcListener MqListener;
+    public static MqRpcClient MqClient;
 
     public static void print(String text) {
         try {
@@ -81,26 +82,29 @@ public class Plugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        try {
+            MqClient = new MqRpcClient("192.168.211.63", "Minecraft", BuiltinExchangeType.DIRECT);
+        } catch (Exception e) {
+            System.out.print("Failed to establish rabbit.");
+            return;
+        }
 
 //        try {
 //            MqRpcClient c = new MqRpcClient("192.168.211.63", "Minecraft", BuiltinExchangeType.DIRECT);
-//            PlayerInfoRequest pir = new PlayerInfoRequest();
-//            pir.setUuid(UUID.randomUUID().toString());
-//            RabbitMessagePayload msg = new RabbitMessagePayload(pir);
-//            msg.setType("PlayerInfoRequest");
+//            MobExpRequest req = new MobExpRequest();
+//            RabbitMessagePayload msg = new RabbitMessagePayload(req);
 //            RabbitMessagePayload response = c.call("Minecraft", "TestMessage", msg, 10);
 //            System.out.print("Response: " + response.getData());
 //        } catch (Exception e) {
 //            System.out.print(e.getMessage());
 //        }
-        try {
-            MqListener = new MqRpcListener("Test", "192.168.211.63", "Minecraft", "JavaTestQueue", BuiltinExchangeType.DIRECT, true, new ExecuterTest());
-            MqListener.start();
-        } catch (Exception e) {
-            System.out.print(e.getMessage());
-            System.out.print(Arrays.toString(e.getStackTrace()));
-        }
-
+//        try {
+//            MqListener = new MqRpcListener("Test", "192.168.211.63", "Minecraft", "JavaTestQueue", BuiltinExchangeType.DIRECT, true, new ExecuterTest());
+//            MqListener.start();
+//        } catch (Exception e) {
+//            System.out.print(e.getMessage());
+//            System.out.print(Arrays.toString(e.getStackTrace()));
+//        }
         print(" ____  _            _        _       _     _____  _____   _____ ", ChatColor.BLUE);
         print("|  _ \\| |          | |      | |     | |   |  __ \\|  __ \\ / ____|", ChatColor.BLUE);
         print("| |_) | | ___   ___| | _____| | ___ | |_  | |__) | |__) | |  __ ", ChatColor.BLUE);
@@ -112,10 +116,15 @@ public class Plugin extends JavaPlugin implements Listener {
 
         if (BuildVersion.equals(RunningVersion)) {
 
-            MobExp[] m = DataLoader.LoadMobs();
-
-            for (MobExp m1 : m) {
-                MobList.put(m1.getName(), m1.getExp());
+            try {
+                MobExpResponse response = MqClient.Call("Minecraft", "DataService", new MobExpRequest(), 10, MobExpResponse.class);
+                for (MobExp m1 : response.getMobs()) {
+                    MobList.put(m1.getName(), m1.getExp());
+                    System.out.print("Setting Exp for " + m1.getName() + " to " + m1.getExp());
+                }
+            } catch (Exception e) {
+                System.out.print("Failed to Connect to MQ.");
+                return;
             }
 
             Running = true;

@@ -18,6 +18,7 @@ public final class RabbitMessagePayload {
     }
     
     public RabbitMessagePayload(Object o){
+        setType(o.getClass().getSimpleName());
          Gson gson = new Gson();
          setData( gson.toJson(o));
     }

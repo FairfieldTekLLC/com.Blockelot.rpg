@@ -7,19 +7,7 @@ package com.blockelot.rpg.RpgPlayer.Classes;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
-import com.blockelot.rpg.Plugin;
-import com.blockelot.rpg.RpgPlayer.Contracts.*;
-import com.blockelot.rpg.RpgPlayer.Tasks.*;
-import com.blockelot.rpg.RpgPlayer.Util.Graphics;
-import com.blockelot.rpg.RpgPlayer.Util.Http;
-import com.google.gson.Gson;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
 /**
  *
  * @author geev

@@ -9,7 +9,7 @@ import com.blockelot.rpg.Plugin;
 import com.blockelot.rpg.RpgPlayer.Contracts.*;
 import com.blockelot.rpg.RpgPlayer.Tasks.*;
 import com.blockelot.rpg.RpgPlayer.Util.Graphics;
-import com.blockelot.rpg.RpgPlayer.Util.Http;
+//import com.blockelot.rpg.RpgPlayer.Util.Http;
 import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -45,35 +45,26 @@ public class PlayerInfo {
         Plugin.print("SetHeathScaled:false");
         Player.setHealthScaled(false);
         Plugin.print("Loading Info.");
+
         PlayerInfoResponse response;
+        PlayerInfoRequest req = new PlayerInfoRequest();
+        req.setUuid(this.Uuid);
         try {
-
-            Plugin.print("Creatng GSON");
-            Gson gson = new Gson();
-
-            Plugin.print("Creating PlayerInfoRequest");
-            PlayerInfoRequest req = new PlayerInfoRequest();
-
-            Plugin.print("Setting Uuid to: " + this.Uuid);
-            req.setUuid(this.Uuid);
-
-            Plugin.print("Setting Body");
-            String body = gson.toJson(req);
-
-            Plugin.print("Requesting from server");
-            response = gson.fromJson(Http.RequestHttp(Plugin.BaseUri + "PlayerLoad", body), PlayerInfoResponse.class);
-
-            if (response == null) {
-                Plugin.print("Failed...");
-                LoadedSuccess = false;
-                return;
-            }
+            response = Plugin.MqClient.Call("Minecraft", "DataService", req, 10, PlayerInfoResponse.class);
         } catch (Exception e) {
             Plugin.print("Failed...");
             LoadedSuccess = false;
             return;
         }
         Plugin.print("Success...");
+
+//        System.out.print("Exp To Level: " + response.getExpToLevel());
+//        System.out.print("ClassId: " + response.getClassId());
+//        System.out.print("ClassName: " + response.getClassName());
+//        System.out.print("Level: " + response.getLvl());
+//        System.out.print("Exp: " + response.getExp());
+//        System.out.print("HP Current: " +response.getHpCur() );
+                
 
         setId(response.getId());
         PlayerStats.LoadBase(response.getStr(), response.getSta(), response.getDex(), response.getWis(), response.getCha(), response.getAc());
@@ -90,16 +81,16 @@ public class PlayerInfo {
         ItemStack[] tst;
         try {
             tst = com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvArm());
-            Plugin.print("# of ITems " + tst.length);
+            //Plugin.print("# of ITems " + tst.length);
             player.getInventory().setArmorContents(tst);
         } catch (Exception e) {
             Plugin.print("Exception: " + e.getMessage());
         }
 
         try {
-            Plugin.print(response.getInvCont());
+            //Plugin.print(response.getInvCont());
             tst = com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvCont());
-            Plugin.print("# of ITems " + tst.length);
+            //Plugin.print("# of ITems " + tst.length);
             player.getInventory().setContents(tst);
 
             //player.getInventory().getContents();
@@ -108,9 +99,9 @@ public class PlayerInfo {
         }
 
         try {
-            Plugin.print(response.getInvEnd());
+            //Plugin.print(response.getInvEnd());
             tst = com.blockelot.rpg.RpgPlayer.Util.Inventory.itemStackArrayFromBase64(response.getInvEnd());
-            Plugin.print("# of ITems " + tst.length);
+            //Plugin.print("# of ITems " + tst.length);
             player.getEnderChest().setContents(tst);
 
         } catch (Exception e) {
@@ -186,7 +177,8 @@ public class PlayerInfo {
         if (!getSavingAsync()) {
             Plugin.print("Saving Player...");
             setSavingAsync(true);
-            PlayerInfoResponse req = new PlayerInfoResponse();
+            PlayerInfoSaveRequest req = new PlayerInfoSaveRequest();
+
             req.setExp(getPlayerStats().getExp());
             req.setHpCur((int) Player.getHealth());
             req.setId(getId());

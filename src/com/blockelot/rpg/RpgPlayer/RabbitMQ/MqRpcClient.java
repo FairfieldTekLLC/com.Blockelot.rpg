@@ -4,8 +4,6 @@
  * and open the template in the editor.
  */
 package com.blockelot.rpg.RpgPlayer.RabbitMQ;
-
-import com.blockelot.rpg.Plugin;
 import com.google.gson.Gson;
 import com.rabbitmq.client.*;
 import java.io.IOException;
@@ -21,7 +19,7 @@ public class MqRpcClient implements AutoCloseable {
 
     private Connection Connection;
     private Channel Channel;
-    private String Exchange;
+    private final String Exchange;
     private final Gson gson = new Gson();
 
     public MqRpcClient(String server, String exchange, BuiltinExchangeType type) throws IOException, TimeoutException {
@@ -37,10 +35,18 @@ public class MqRpcClient implements AutoCloseable {
         //Only need one message at a time, since we only expect one message
         Channel.basicQos(1);
         //We create the exchange incase it doesn't exist
-        Channel.exchangeDeclare(exchange, type, true);
+        Channel.exchangeDeclare(Exchange, type, true);
     }
+    
+    public <T> T Call(String exchange, String queueName, Object payload, long timeoutSeconds, Class<T> clazz) throws IOException, InterruptedException, TimeoutException 
+    {
+        RabbitMessagePayload Sendpayload = new RabbitMessagePayload(payload);
+        RabbitMessagePayload response = call(exchange,queueName,Sendpayload,timeoutSeconds);
+        return clazz.cast(gson.fromJson(response.getData(), clazz));
+    }
+    
 
-    public RabbitMessagePayload call(String exchange, String queueName, RabbitMessagePayload rmp, long timeoutSeconds) throws IOException, InterruptedException, TimeoutException {
+    private RabbitMessagePayload call(String exchange, String queueName, RabbitMessagePayload rmp, long timeoutSeconds) throws IOException, InterruptedException, TimeoutException {
         //Really don't need this since we create a Queue for each call.
         final String corrId = UUID.randomUUID().toString();
         //A temporary Queue used to get the reply.
@@ -89,8 +95,8 @@ public class MqRpcClient implements AutoCloseable {
                 Channel.close();
             }
         } catch (IOException | TimeoutException e) {
-            Plugin.print(e.getMessage());
-            Plugin.print(Arrays.toString(e.getStackTrace()));
+            System.out.print(e.getMessage());
+            System.out.print(Arrays.toString(e.getStackTrace()));
         }
         Channel = null;
         try {
@@ -99,8 +105,8 @@ public class MqRpcClient implements AutoCloseable {
 
             }
         } catch (IOException e) {
-            Plugin.print(e.getMessage());
-            Plugin.print(Arrays.toString(e.getStackTrace()));
+            System.out.print(e.getMessage());
+           System.out.print(Arrays.toString(e.getStackTrace()));
         }
         Connection = null;
     }

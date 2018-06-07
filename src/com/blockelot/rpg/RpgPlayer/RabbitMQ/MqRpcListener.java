@@ -5,7 +5,7 @@
  */
 package com.blockelot.rpg.RpgPlayer.RabbitMQ;
 
-import com.blockelot.rpg.Plugin;
+
 import com.google.gson.Gson;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BuiltinExchangeType;
@@ -106,16 +106,16 @@ public final class MqRpcListener extends Thread implements AutoCloseable {
                     try {
                         Consumer.wait();
                     } catch (InterruptedException e) {
-                        Plugin.print(e.getMessage());
-                        Plugin.print(Arrays.toString(e.getStackTrace()));
+                        System.out.print(e.getMessage());
+                        System.out.print(Arrays.toString(e.getStackTrace()));
                     }
                 }
                 IsStopped = true;
                 close();
             }
         } catch (IOException | TimeoutException e) {
-            Plugin.print(e.getMessage());
-            Plugin.print(Arrays.toString(e.getStackTrace()));
+            System.out.print(e.getMessage());
+            System.out.print(Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -126,8 +126,8 @@ public final class MqRpcListener extends Thread implements AutoCloseable {
                 Channel.close();
             }
         } catch (IOException | TimeoutException e) {
-            Plugin.print(e.getMessage());
-            Plugin.print(Arrays.toString(e.getStackTrace()));
+            System.out.print(e.getMessage());
+            System.out.print(Arrays.toString(e.getStackTrace()));
         }
         Channel = null;
         try {
@@ -136,8 +136,8 @@ public final class MqRpcListener extends Thread implements AutoCloseable {
 
             }
         } catch (IOException e) {
-            Plugin.print(e.getMessage());
-            Plugin.print(Arrays.toString(e.getStackTrace()));
+            System.out.print(e.getMessage());
+            System.out.print(Arrays.toString(e.getStackTrace()));
         }
 
         Connection = null;
